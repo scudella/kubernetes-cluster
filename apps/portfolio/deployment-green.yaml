@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portfolio-green
+  labels:
+    app: portfolio-green
+  namespace: portfolio
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: portfolio-green
+
+  template:
+    metadata:
+      labels:
+        app: portfolio-green
+
+    spec:
+      containers:
+      - name: portfolio
+        image: scudella/portfolio:v2.3.7
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 80
