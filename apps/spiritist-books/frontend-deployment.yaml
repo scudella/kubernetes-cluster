@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: spiritist-books
+  labels:
+    app: spiritist-books
+    component: frontend
+spec:
+  replicas: 4
+
+  selector:
+    matchLabels:
+      app: spiritist-books
+      component: frontend
+
+  template:
+    metadata:
+      labels:
+        app: spiritist-books
+        component: frontend
+    spec:
+      containers:
+      - name: frontend
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: https://spiritist-books-backend.scudella.net.br
+        image: scudella/spiritist:v4.00.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+
