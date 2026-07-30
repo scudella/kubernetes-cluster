@@ -5,6 +5,7 @@
 - [x] Portfolio frontend
 - [x] Portfolio-green frontend
 - [x] Spiritist Books frontend
+- [x] store-nextjs standalone
 - [ ] Spiritist Books backend (PM2)
 - [ ] Portfolio backend (PM2)
 - [ ] Webrtc (PM2)
@@ -18,8 +19,6 @@
 - [ ] jobster frontend
 - [ ] jobify frontend
 - [ ] jobster/jobify backend (PM2)
-- [ ] store-nextjs frontend
-- [ ] store-nextjs backend (PM2)
 - [ ] search-github frontend (netlify)
 - [ ] recipes (netlify)
 - [ ] design (netlify)

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: store-nextjs
+  namespace: store-nextjs
+
+  labels:
+    app: store-nextjs
+
+spec:
+  selector:
+    app: store-nextjs
+
+  ports:
+  - port: 3000
+    targetPort: 3000
+
+  type: ClusterIP

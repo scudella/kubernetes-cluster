@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: store-nextjs
+  namespace: store-nextjs
+  labels:
+    app: store-nextjs
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: store-nextjs
+
+  template:
+    metadata:
+      labels:
+        app: store-nextjs
+
+    spec:
+      volumes:
+      - name: private-key-volume
+        secret:
+          defaultMode: 420
+          items:
+          - key: oci_api_key.pem
+            path: oci_api_key.pem
+          secretName: oci-private-key-store-nextjs
+            
+      containers:
+      - name: store-nextjs
+        image: scudella/store-nextjs:v1.0.9
+        imagePullPolicy: IfNotPresent
+
+        ports:
+          - containerPort: 3000
+
+        volumeMounts:
+          - mountPath: /etc/secrets/oci
+            name: private-key-volume
+            readOnly: true
+
+        envFrom:
+          - configMapRef:
+              name: config
+
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_URL
+              name: app-credentials-store-nextjs
+
+        - name: CLERK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: CLERK_SECRET_KEY
+              name: app-credentials-store-nextjs
+
+        - name: ADMIN_USER_ID
+          valueFrom:
+            secretKeyRef:
+              key: ADMIN_USER_ID
+              name: app-credentials-store-nextjs
+
+        - name: OCI_TENANCY_OCID
+          valueFrom:
+            secretKeyRef:
+              key: OCI_TENANCY_OCID
+              name: app-credentials-store-nextjs
+
+        - name: OCI_USER_OCID
+          valueFrom:
+            secretKeyRef:
+              key: OCI_USER_OCID
+              name: app-credentials-store-nextjs
+
+        - name: OCI_FINGERPRINT
+          valueFrom:
+            secretKeyRef:
+              key: OCI_FINGERPRINT
+              name: app-credentials-store-nextjs
+
+        - name: STRIPE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: STRIPE_SECRET_KEY
+              name: app-credentials-store-nextjs
+
