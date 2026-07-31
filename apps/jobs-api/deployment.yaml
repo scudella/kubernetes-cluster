@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: jobs-api
+  namespace: jobs-api
+
+  labels:
+    app: jobs-api
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: jobs-api
+
+  template:
+    metadata:
+      labels:
+        app: jobs-api
+
+    spec:
+      containers:
+      - name: jobs-api
+        image: scudella/jobs-api:v1.0.5
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - containerPort: 5000
+
+        env:
+        - name: MONGO_URI_JOBS
+          valueFrom:
+            secretKeyRef:
+              key: MONGO_URI_JOBS
+              name: app-credentials-jobs-api
+
+        - name: JWT_SECRET_JOBS
+          valueFrom:
+            secretKeyRef:
+              key: JWT_SECRET_JOBS
+              name: app-credentials-jobs-api
+
+        - name: JWT_LIFETIME
+          value: 1d

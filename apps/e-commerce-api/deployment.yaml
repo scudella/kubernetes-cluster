@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: e-commerce-api
+  namespace: e-commerce-api
+
+  labels:
+    app: e-commerce-api
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: e-commerce-api
+
+  template:
+    metadata:
+      labels:
+        app: e-commerce-api
+
+    spec:
+      containers:
+      - name: e-commerce-api
+        image: scudella/e-commerce-api:v1.0.3
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - containerPort: 5000
+
+        env:
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              key: MONGO_URI
+              name: app-credentials-e-commerce-api
+
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: JWT_SECRET
+              name: app-credentials-e-commerce-api
+
+        - name: JWT_LIFETIME
+          value: 1d

@@ -6,6 +6,8 @@
 - [x] Portfolio-green frontend
 - [x] Spiritist Books frontend
 - [x] store-nextjs standalone
+- [x] jobs-api
+- [x] e-commerce-api
 - [ ] Spiritist Books backend (PM2)
 - [ ] Portfolio backend (PM2)
 - [ ] Webrtc (PM2)
@@ -14,8 +16,6 @@
 - [ ] Kubernetes Dashboard
 - [ ] Events frontend
 - [ ] Events backend (PM2)
-- [ ] jobs-api
-- [ ] e-commerce api
 - [ ] jobster frontend
 - [ ] jobify frontend
 - [ ] jobster/jobify backend (PM2)

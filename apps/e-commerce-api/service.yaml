@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: e-commerce-api
+  namespace: e-commerce-api
+
+  labels:
+    app: e-commerce-api
+
+spec:
+  ports:
+  - port: 5000
+    targetPort: 5000
+
+  selector:
+    app: e-commerce-api
+
+  type: ClusterIP
