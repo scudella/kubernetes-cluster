@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: frontend
+  namespace: events
+
+  labels:
+    app: events
+    component: frontend
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: events
+      component: frontend
+
+  template:
+    metadata:
+      labels:
+        app: events
+        component: frontend
+
+    spec:
+      containers:
+      - name: frontend
+        image: scudella/events-frontend:v1.0.4
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - containerPort: 3000
+
+        envFrom:
+          - configMapRef:
+              name: frontend-config

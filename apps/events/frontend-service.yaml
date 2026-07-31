@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: frontend
+  namespace: events
+
+  labels:
+    app: events
+    component: frontend
+
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+
+  selector:
+    app: events
+    component: frontend
+
+  type: ClusterIP

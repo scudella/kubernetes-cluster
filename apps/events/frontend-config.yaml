@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+  
+metadata:
+  name: frontend-config
+  namespace: events
+
+  labels:
+    app: events
+    component: frontend 
+
+data:
+  NEXT_PUBLIC_API_URL: https://events-backend.scudella.net.br
+  NEXT_PUBLIC_FRONTEND_URL: htts://events.scudella.net.br
+  CLOUDINARY_PATHNAME: dzd9hs8by
+  NEXT_PUBLIC_MAPTILER_API_TOKEN: uRG9Mfcn5YuZnBDNuMGv

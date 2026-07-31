@@ -8,13 +8,13 @@
 - [x] store-nextjs standalone
 - [x] jobs-api
 - [x] e-commerce-api
+- [x] Events frontend
 - [ ] Spiritist Books backend (PM2)
 - [ ] Portfolio backend (PM2)
 - [ ] Webrtc (PM2)
 - [ ] Grafana
 - [ ] Prometheus
 - [ ] Kubernetes Dashboard
-- [ ] Events frontend
 - [ ] Events backend (PM2)
 - [ ] jobster frontend
 - [ ] jobify frontend
