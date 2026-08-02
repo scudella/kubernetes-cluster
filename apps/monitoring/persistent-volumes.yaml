@@ -1,0 +1,59 @@
+apiVersion: v1
+items:
+  
+- apiVersion: v1
+  kind: PersistentVolume
+
+  metadata:
+    name: alertmanager-pv
+    labels:
+      pv-label: alertmanager-pv
+
+  spec:
+    capacity:
+      storage: 1Gi
+    accessModes:
+    - ReadWriteOnce
+    storageClassName: local-path
+    persistentVolumeReclaimPolicy: Retain
+    hostPath:
+      path: /mnt/local-storage/prometheus/alertmanager
+    volumeMode: Filesystem
+
+- apiVersion: v1
+  kind: PersistentVolume
+
+  metadata:
+    name: grafana-pv
+    labels:
+      pv-label: grafana-pv
+
+  spec:
+    capacity:
+      storage: 5Gi
+    accessModes:
+    - ReadWriteOnce
+    storageClassName: local-path
+    persistentVolumeReclaimPolicy: Retain
+    hostPath:
+      path: /mnt/local-storage/prometheus/grafana
+    volumeMode: Filesystem
+
+- apiVersion: v1
+  kind: PersistentVolume
+
+  metadata:
+    name: prometheus-pv
+    labels:
+      pv-label: prometheus-pv
+
+  spec:
+    capacity:
+      storage: 10Gi
+    accessModes:
+    - ReadWriteOnce
+    storageClassName: local-path
+    persistentVolumeReclaimPolicy: Retain
+    hostPath:
+      path: /mnt/local-storage/prometheus/prometheus
+    volumeMode: Filesystem

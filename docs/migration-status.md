@@ -9,11 +9,12 @@
 - [x] jobs-api
 - [x] e-commerce-api
 - [x] Events frontend
+- [x] Prometheus
+- [x] Grafana
+- [x] Alert Manager
 - [ ] Spiritist Books backend (PM2)
 - [ ] Portfolio backend (PM2)
 - [ ] Webrtc (PM2)
-- [ ] Grafana
-- [ ] Prometheus
 - [ ] Kubernetes Dashboard
 - [ ] Events backend (PM2)
 - [ ] jobster frontend
