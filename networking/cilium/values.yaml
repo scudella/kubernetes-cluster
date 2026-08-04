@@ -1,0 +1,121 @@
+# ------------------------------------------------------------------------------
+# Cilium configuration
+#
+# Cluster:
+#   Provider: Oracle Cloud (OCI)
+#   Architecture: ARM64 (Ampere A1)
+#   Kubernetes: 1.33.x (kubeadm)
+#   Nodes: 4
+#
+# Migration:
+#   Previous CNI: Weave Net 2.9.0
+#   Initial mode: Keep kube-proxy enabled
+#
+# Future improvements:
+#   - kube-proxy replacement
+#   - Native routing
+#   - WireGuard encryption
+#   - ClusterMesh
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Kubernetes API
+# ------------------------------------------------------------------------------
+
+k8sServiceHost: 10.0.0.11
+k8sServicePort: 6443
+
+# ------------------------------------------------------------------------------
+# Networking
+# ------------------------------------------------------------------------------
+
+routingMode: tunnel
+tunnelProtocol: vxlan
+
+# Match the current Weave MTU to avoid fragmentation during migration.
+mtu: 1376
+
+# Keep kube-proxy until the migration has proven stable.
+kubeProxyReplacement: false
+
+# As the cluster is currently using 
+# 10.32.0.0/12
+# explicitly tell Cilium to continue using the same range
+
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - "10.32.0.0/12"
+    clusterPoolIPv4MaskSize: 24
+
+operator:
+  replicas: 1
+  prometheus:
+    enabled: true
+
+upgradeCompatibility: "1.20"
+
+# ------------------------------------------------------------------------------
+# Hubble
+# ------------------------------------------------------------------------------
+
+hubble:
+  enabled: true
+
+  relay:
+    enabled: true
+
+  ui:
+    enabled: false
+
+# ------------------------------------------------------------------------------
+# Prometheus
+# ------------------------------------------------------------------------------
+
+prometheus:
+  enabled: true
+
+# ------------------------------------------------------------------------------
+# Grafana dashboards
+# ------------------------------------------------------------------------------
+
+dashboards:
+  enabled: true
+
+# ------------------------------------------------------------------------------
+# CNI
+# ------------------------------------------------------------------------------
+
+cni:
+  exclusive: true
+
+# ------------------------------------------------------------------------------
+# Rollout
+# ------------------------------------------------------------------------------
+
+rollOutCiliumPods: true
+
+# ------------------------------------------------------------------------------
+# Security
+# ------------------------------------------------------------------------------
+
+securityContext:
+  capabilities:
+    ciliumAgent:
+      - CHOWN
+      - KILL
+      - NET_ADMIN
+      - NET_RAW
+      - IPC_LOCK
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+
+    cleanCiliumState:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
