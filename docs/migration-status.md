@@ -12,6 +12,7 @@
 - [x] Prometheus
 - [x] Grafana
 - [x] Alert Manager
+- [x] Weave to Cilium CNI migration
 - [ ] Spiritist Books backend (PM2)
 - [ ] Portfolio backend (PM2)
 - [ ] Webrtc (PM2)
