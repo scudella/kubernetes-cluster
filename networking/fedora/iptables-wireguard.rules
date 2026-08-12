@@ -1,0 +1,25 @@
+# Reusable manual rules for the Fedora worker.
+#
+# These are the networking rules observed as relevant to the working setup.
+# Cilium/Kubernetes-generated chains are intentionally omitted.
+#
+# Apply idempotently with:
+#   sudo iptables -C <chain> <rule> || sudo iptables -A <chain> <rule>
+
+# Cilium VXLAN
+-A INPUT -p udp --dport 8472 -j ACCEPT
+-A FORWARD -i wg0 -j ACCEPT
+-A FORWARD -o wg0 -j ACCEPT
+
+# Cilium Geneve (keep if Geneve is enabled/used)
+-A INPUT -i wg0 -p udp --dport 6081 -j ACCEPT
+
+# Forward the home LAN/WireGuard paths
+-A FORWARD -i enp2s0 -o wg0 -j ACCEPT
+-A FORWARD -i wg0 -o enp2s0 -j ACCEPT
+
+# The captured working Fedora state had TCP MSS clamping on forwarded SYNs.
+-A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+# NAT traffic leaving Fedora through the WireGuard tunnel.
+-A POSTROUTING -o wg0 -j MASQUERADE

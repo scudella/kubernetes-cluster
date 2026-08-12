@@ -128,6 +128,24 @@ These components are managed through Helm.
 
 ---
 
+                       Internet
+                           │
+                     ┌─────┴─────┐
+                     │ WireGuard │
+                     └─────┬─────┘
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+        OCI network                  Home network
+       10.0.0.0/24                192.168.0.0/24
+             │                           │
+            node1                     Fedora
+      ┌──────┼──────┐──────┐        ┌────┴────┐
+      │      │      │      │        │         │
+    node4  node2  node3  node1   Fedora    other
+
+---
+
 # Storage
 
 Application manifests are fully version-controlled.

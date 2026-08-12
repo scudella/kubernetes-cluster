@@ -1,0 +1,11 @@
+[Interface]
+PrivateKey = <FEDORA_PRIVATE_KEY>
+Address = 10.100.0.2/24
+
+[Peer]
+# OCI VM node1
+PublicKey = Pijwh5GRERfpxa82dVfS7gHzRw1Kl0n2Xc1jaXL5d2k=
+Endpoint = 150.136.96.130:51820
+AllowedIPs = 10.100.0.0/24, 10.32.0.0/16, 10.0.0.0/24
+PersistentKeepalive = 25
+
