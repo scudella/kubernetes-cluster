@@ -3,6 +3,8 @@
 ## Status
 
 This documents the working Fedora-to-OCI networking state captured on 2026-08-11.
+Updated on 2026-08-13 with the changes required when moving dashboard pods over 
+to fedora.
 
 The Fedora machine is a Kubernetes worker and uses its WireGuard address as its
 Kubernetes `InternalIP`:
@@ -12,6 +14,9 @@ Kubernetes `InternalIP`:
 | `node1` | `10.0.0.11` | `10.32.3.0/24` | Ubuntu 24.04.4 |
 | `node2` | `10.0.0.12` | `10.32.0.0/24` | Ubuntu 24.04.4 |
 | `fedora` | `10.100.0.2` | `10.32.4.0/24` | Fedora Linux 44 |
+
+node3 and node4 are not documented because they were decommissioned
+to the changes on the free OCI plan.
 
 Cilium is using VXLAN. The captured Cilium MTU is `1360`, while WireGuard
 uses MTU `1420`.
@@ -36,7 +41,16 @@ Home LAN
        |       node1 = 10.0.0.11
        |       node2 = 10.0.0.12
        |
-       +---------------- Kubernetes pod network 10.32.0.0/16
+       +---------------- Kubernetes pod network 10.32.0.0/12
+       |
+       +---------------- Kubernetes service network 10.96.0.0/16
+
+The kubernetes service network was not a problem when installing the wireguard 
+and testing with pods on node2 and fedora. However, during the dashboard pods 
+migration to fedora, we spot the kubernetes service network on 10.96.0.0/12 overlaps 
+the new wireguard network 10.100.0.0/24. The kubernetes service network was then shrunk 
+to 10.96.0.0/16.
+
 ```
 
 The important design point is that Kubernetes/Cilium sees Fedora as
@@ -50,12 +64,13 @@ Fedora's `wg0` is:
 - address: `10.100.0.2/24`
 - MTU: `1420`
 - peer: OCI `node1`
-- peer endpoint: `150.136.96.130:51820`
+- peer endpoint: `158.101.111.86:51820`
 - persistent keepalive: `25`
 - AllowedIPs:
   - `10.100.0.0/24`
-  - `10.32.0.0/16`
+  - from `10.32.0.0/16` to `10.32.0.0/12`
   - `10.0.0.0/24`
+  - added `10.96.0.0/16`
 
 The captured configuration contains a redacted private key. The example in
 `networking/fedora/wg0.conf.example` intentionally leaves that key out.
@@ -66,8 +81,9 @@ The important routes are:
 
 ```text
 10.0.0.0/24       dev wg0
-10.32.0.0/16      dev wg0
+10.32.0.0/12      dev wg0
 10.100.0.0/24     dev wg0
+10.96.0.0/16      dev wg0
 192.168.0.0/24    dev enp2s0
 ```
 
@@ -107,6 +123,26 @@ The captured system also has a TCP MSS clamp on forwarded SYN packets:
 
 ```text
 -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+```
+
+During the dashboard migration some masquerade settings were not working because 
+kube-proxy was still present and manipulating the iptables. During weave-cilium 
+migration was decided not to touch kube-proxy.
+
+To make sure cilium would do the right masquerade we decide to remove kube-proxy 
+during dashboard migration.
+
+### Kube-Proxy Removal & iptables Cleanup
+To hand off Service VIP handling entirely to Cilium's eBPF programs, kube-proxy 
+was removed and old iptables rules were purged:
+
+```bash
+# Delete kube-proxy DaemonSet and ConfigMap
+kubectl -n kube-system delete daemonset kube-proxy
+kubectl -n kube-system delete cm kube-proxy
+
+# Clear legacy KUBE-* iptables rules on host nodes
+sudo iptables-save | grep -v KUBE | sudo iptables-restore
 ```
 
 ## Kubernetes node IP
@@ -150,28 +186,55 @@ devices: "enp2s0"
 directRoutingDevice: "enp2s0"
 ```
 
-This is worth documenting carefully: the Kubernetes node address is
-`10.100.0.2`, and the host has a `wg0` route to the OCI networks, but the
-captured Cilium configuration still specifies `enp2s0` as its device/direct
-routing device.
-
-Do not change this to `wg0` solely because the node's Kubernetes address is
-`10.100.0.2`. The earlier troubleshooting notes considered `wg0` device
-selection, but the captured working configuration uses `enp2s0`.
-
-The Cilium node object confirms:
+After the dashboard migration, the ConfigMap was updated to enable strict eBPF Kube-Proxy replacement, 
+configure multi-interface binding, and remove legacy masquerading flags:
 
 ```yaml
-spec:
-  addresses:
-    - ip: 10.100.0.2
-      type: InternalIP
-    - ip: 10.32.4.233
-      type: CiliumInternalIP
-  ipam:
-    podCIDRs:
-      - 10.32.4.0/24
+data:
+  # Enable Cilium eBPF Service Translation
+  kube-proxy-replacement: "true"
+
+  # Direct API Server bootstrap parameters (bypasses 10.96.0.1 chicken-and-egg bootstrap loop)
+  k8s-service-host: "10.0.0.11"
+  k8s-service-port: "6443"
+
+  # Multi-interface discovery matching WireGuard, Ethernet, and virtual interfaces across all nodes
+  devices: "eth+ en+ wg+"
+
+  # Pod CIDR routing & eBPF Masquerading
+  ipv4-native-routing-cidr: "10.32.0.0/12"
+  enable-ipv4-masquerade: "true"
+  enable-bpf-masquerade: "true"
+  
+  # REMOVED: egress-masquerade-interfaces (conflicted with enable-bpf-masquerade)
+
 ```
+
+In order to make helm have its values up to date we issue the following commands
+
+```bash
+
+helm get values cilium -n kube-system -o yaml > cilium-values-running.yaml
+
+# Edited cilium-values-running.yaml to update to the above changes
+# Update helm values
+
+helm upgrade cilium cilium/cilium \
+  -n kube-system \
+  -f cilium-values-running.yaml \
+  --reuse-values
+
+```
+
+
+### WireGuard & eBPF Interface Binding
+Interface Discovery: Setting devices: "eth+ en+ wg+" resolved node crashes where fixed 
+device names (wg0 enp2s0) caused agent failure on worker nodes without identical interface 
+naming schemes.
+
+Direct Routing: Cilium bound eBPF programs directly to wg0 (10.100.0.2) and physical Ethernet 
+adapters (enp2s0 / eth0), enabling direct BPF service load balancing over WireGuard-encrypted tunnels.
+
 
 ## OCI VCN routing
 
