@@ -13,14 +13,14 @@
 - [x] Grafana
 - [x] Alert Manager
 - [x] Weave to Cilium CNI migration
-- [ ] Spiritist Books backend (PM2)
-- [ ] Portfolio backend (PM2)
-- [ ] Webrtc (PM2)
-- [ ] Kubernetes Dashboard
-- [ ] Events backend (PM2)
+- [x] Spiritist Books backend (PM2)
+- [x] Portfolio backend (PM2)
+- [x] Webrtc (PM2)
+- [x] Kubernetes Dashboard
+- [x] Events backend (PM2)
+- [x] jobster/jobify backend (PM2)
 - [ ] jobster frontend
 - [ ] jobify frontend
-- [ ] jobster/jobify backend (PM2)
 - [ ] search-github frontend (netlify)
 - [ ] recipes (netlify)
 - [ ] design (netlify)
@@ -29,4 +29,3 @@
 - [ ] gadget-junkie (netlify)
 - [ ] cocktails (netlify)
 - [ ] store (netlify)
-

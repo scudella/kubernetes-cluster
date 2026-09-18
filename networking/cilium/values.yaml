@@ -34,11 +34,17 @@ tunnelProtocol: vxlan
 
 # Set a new MTU for VXLAN encapsulation inside wg 
 mtu: 1360
-devices: "enp2s0"
+devices: eth+ en+ wg+
 directRoutingDevice: "enp2s0"
 
 # Keep kube-proxy until the migration has proven stable.
-kubeProxyReplacement: false
+# Removed during kubernetes dashboard migration to fedora
+kubeProxyReplacement: true
+
+bpf:
+  masquerade: true
+
+egressMasqueradeInterfaces: ""
 
 # As the cluster is currently using 
 # 10.32.0.0/12

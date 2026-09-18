@@ -11,12 +11,12 @@ The cluster uses:
 - Kubernetes version: 1.33.x
 - Cilium: 1.20.x
 - Oracle Cloud Always Free (Ampere ARM)
-- 4-node cluster
+- 2-node Ampere arm cluster - added fedora at home later
 
 ## Current Configuration
 
 - Routing Mode: VXLAN Tunnel
-- kube-proxy: Enabled
+- kube-proxy: Disabled
 - IPAM: Cluster Pool
 - Pod CIDR: 10.32.0.0/12
 - Encryption: Disabled
@@ -33,9 +33,10 @@ native routing or cloud-specific integration.
 
 ### kube-proxy
 
-The cluster currently keeps kube-proxy enabled to minimize migration risk.
+The cluster kept kube-proxy enabled to minimize migration risk.
 
-Future evaluation may enable Cilium's kube-proxy replacement.
+During kubernetes dashboard pods migration to fedora, kube-proxy was deleted and Cilium 
+took over its functionality. This way was simpler to apply IP masquerade.
 
 ### Encryption
 
@@ -74,8 +75,8 @@ Migration validation included:
 
 Planned work includes:
 
-- Add home-based Kubernetes nodes
+- Add home-based Kubernetes nodes - Done
 - Evaluate Cilium ClusterMesh
 - Enable WireGuard encryption
-- Evaluate kube-proxy replacement
+- Evaluate kube-proxy replacement - Done
 - Improve observability with Hubble metrics
