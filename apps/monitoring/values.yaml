@@ -1,11 +1,7 @@
 alertmanager:
   alertmanagerSpec:
     nodeSelector:
-      kubernetes.io/hostname: node4
-    securityContext:
-      fsGroup: 2000
-      runAsGroup: 2000
-      runAsUser: 114
+      kubernetes.io/hostname: fedora
     storage:
       volumeClaimTemplate:
         spec:
@@ -13,28 +9,31 @@ alertmanager:
           - ReadWriteOnce
           resources:
             requests:
-              storage: 1Gi
+              storage: 10Gi
           storageClassName: local-path
+  service:
+    type: NodePort
+    nodePort: 30109
+
 grafana:
   enabled: true
+  nodeSelector:
+    kubernetes.io/hostname: fedora
   grafana.ini:
     metrics:
       enabled: true
   initChownData:
     enabled: false
-  nodeSelector:
-    kubernetes.io/hostname: node3
   persistence:
     accessModes:
     - ReadWriteOnce
     enabled: true
-    size: 5Gi
+    size: 10Gi
     storageClassName: local-path
-  podSecurityContext:
-    fsGroup: 472
-    runAsUser: 472
   replicas: 1
   service:
+    type: NodePort
+    nodePort: 30105
     port: 80
     portName: http-web
     targetPort: 3000
@@ -45,23 +44,11 @@ grafana:
     path: /metrics
     scheme: http
     scrapeTimeout: 30s
+
 prometheus:
   prometheusSpec:
-    additionalScrapeConfigs: "- job_name: 'webrtc'\n  scrape_interval: 15s\n  scheme:
-      https\n  static_configs:\n    - targets: ['10.0.0.12:5000']\n      labels:\n
-      \       app_environment: 'external-vm'\n        app_name: 'WebRTC'\n  tls_config:\n
-      \   insecure_skip_verify: true\n# *** NEW: Spiritist Books Backend Job ***\n-
-      job_name: 'spiritist-books-backend'\n  scrape_interval: 15s\n  # Scheme defaults
-      to 'http' if not specified, but setting it explicitly is good practice\n  scheme:
-      http\n  static_configs:\n    - targets: ['10.0.0.11:3000'] \n      labels:\n
-      \       app_environment: 'external-vm'\n        app_name: 'Spiritist-Books-Backend'\n"
     nodeSelector:
-      kubernetes.io/hostname: node4
-    securityContext:
-      allowPrivilegeEscalation: false
-      fsGroup: 119
-      runAsGroup: 119
-      runAsUser: 114
+      kubernetes.io/hostname: fedora
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -69,5 +56,27 @@ prometheus:
           - ReadWriteOnce
           resources:
             requests:
-              storage: 10Gi
+              storage: 50Gi
           storageClassName: local-path
+    additionalScrapeConfigs:
+      - job_name: 'webrtc'
+        scrape_interval: 15s
+        scheme: https
+        static_configs:
+          - targets: ['10.0.0.11:5000']
+            labels:
+              app_environment: 'external-vm'
+              app_name: 'WebRTC'
+        tls_config:
+          insecure_skip_verify: true
+      - job_name: 'spiritist-books-backend'
+        scrape_interval: 15s
+        scheme: http
+        static_configs:
+          - targets: ['10.0.0.11:3000']
+            labels:
+              app_environment: 'external-vm'
+              app_name: 'Spiritist-Books-Backend'
+  service:
+    type: NodePort
+    nodePort: 30108
