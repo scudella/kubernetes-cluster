@@ -21,9 +21,21 @@ spec:
         app: e-commerce-api
 
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - e-commerce-api
+              topologyKey: kubernetes.io/hostname
       containers:
       - name: e-commerce-api
-        image: scudella/e-commerce-api:v1.0.3
+        image: scudella/e-commerce-api:v1.1.2
         imagePullPolicy: IfNotPresent
 
         ports:

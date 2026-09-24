@@ -20,12 +20,24 @@ spec:
         app: spiritist-books
         component: frontend
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: component
+                  operator: In
+                  values:
+                  - frontend
+              topologyKey: kubernetes.io/hostname
       containers:
       - name: frontend
         env:
         - name: NEXT_PUBLIC_API_URL
-          value: https://spiritist-books-backend.scudella.net.br
-        image: scudella/spiritist:v4.00.0
+          value: https://jgrg23lrb2ojkgsme246jwmgje0galhi.lambda-url.sa-east-1.on.aws
+        image: scudella/spiritist:v4.0.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
