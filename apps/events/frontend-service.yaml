@@ -13,9 +13,10 @@ spec:
   ports:
   - port: 3000
     targetPort: 3000
+    nodePort: 30103
 
   selector:
     app: events
     component: frontend
 
-  type: ClusterIP
+  type: NodePort

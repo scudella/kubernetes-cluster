@@ -10,8 +10,9 @@ spec:
   ports:
   - port: 80
     targetPort: 80
+    nodePort: 30102
 
   selector:
     app: portfolio-green
 
-  type: ClusterIP
+  type: NodePort
