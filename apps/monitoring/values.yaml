@@ -80,3 +80,23 @@ prometheus:
   service:
     type: NodePort
     nodePort: 30108
+
+# --- Control Plane Configurations (Add at Root Level) ---
+kubeControllerManager:
+  enabled: true
+  endpoints:
+    - 10.0.0.11
+
+kubeScheduler:
+  enabled: true
+  endpoints:
+    - 10.0.0.11
+
+kubeEtcd:
+  enabled: true
+  endpoints:
+    - 10.0.0.11
+  service:
+    enabled: true
+    port: 2381
+    targetPort: 2381
