@@ -2,18 +2,16 @@
 # Cilium configuration
 #
 # Cluster:
-#   Provider: Oracle Cloud (OCI)
-#   Architecture: ARM64 (Ampere A1)
+#   Provider: Oracle Cloud (OCI) and home network
+#   Architecture: ARM64 (Ampere A1) and AMD64
 #   Kubernetes: 1.33.x (kubeadm)
-#   Nodes: 4
+#   Nodes: 3
 #
 # Migration:
 #   Previous CNI: Weave Net 2.9.0
-#   Initial mode: Keep kube-proxy enabled
+#   Initial mode: Keep kube-proxy enabled. Replaced by cilium afterwards.
 #
 # Future improvements:
-#   - kube-proxy replacement
-#   - Native routing
 #   - WireGuard encryption
 #   - ClusterMesh
 # ------------------------------------------------------------------------------
@@ -35,10 +33,8 @@ tunnelProtocol: vxlan
 # Set a new MTU for VXLAN encapsulation inside wg 
 mtu: 1360
 devices: enp+ eth+ wg+
-# directRoutingDevice: "enp2s0"
 
-# Keep kube-proxy until the migration has proven stable.
-# Removed during kubernetes dashboard migration to fedora
+# Removed kubeProxy during kubernetes dashboard migration to fedora
 kubeProxyReplacement: true
 
 bpf:
