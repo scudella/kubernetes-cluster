@@ -15,7 +15,7 @@ The cluster has been running continuously since **2022**.
 
 # Oracle Always Free Changes
 
-In August 2026 Oracle announced a reduction of the Always Free ARM resources from four virtual machines to the equivalent capacity of two virtual machines.
+In August 2026 Oracle announced a reduction of the Always Free ARM resources from up to four virtual machines (4 OCPU total) to the equivalent capacity of two virtual machines (2 OCPU total).
 
 Because of that change, this cluster is being migrated into a **hybrid Kubernetes cluster**, keeping the Oracle control plane while extending the cluster with nodes hosted at home.
 
@@ -62,12 +62,15 @@ Some applications continue to run on Netlify, while Kubernetes hosts the product
 
 In addition to Kubernetes, some services currently still run directly on the VMs using **PM2**, including:
 
-* three backend applications
-* MariaDB
-* PostgreSQL
+* three backend applications (events, jobster/jobify, and spiritist books)
+* MariaDB for event strapi backend
+* PostgreSQL for store-nextjs app
 * one WebRTC application
+* portfolio and spiritist books frontend apps are running on k8s and on node6 by nginx.
 
 These services will eventually be migrated away from the Oracle VMs.
+
+Spiritist books backend is currently running on lambda AWS. The DB is hosted by mongoDB also at AWS. Both in Sao Paulo (sa-east-1)
 
 ---
 
@@ -79,7 +82,7 @@ Current CNI:
 
 * Cilium 1.20
 * VXLAN tunneling
-* kube-proxy enabled -> disabled after a few days when migrating the pods.
+* kube-proxy enabled -> disabled after a few days when migrating monitoring over to fedora.
 * Hubble Relay enabled
 * WireGuard encryption disabled (planned)
 * ClusterMesh not yet enabled
@@ -98,7 +101,7 @@ Ingress is handled by self-managed NGINX reverse proxies running on **node1**, *
 
 External traffic reaches NGINX, which forwards requests to Kubernetes Services inside the cluster, nginx services apps on node6 or AWS lambda api.
 
-The control plane node hosts Kubernetes control components only; application workloads are scheduled on worker nodes. While node2 is off due to out of capacity, control plane is also running apps pods.
+The control plane node hosts Kubernetes control components only; application workloads are scheduled on worker nodes. 
 
 ---
 
@@ -106,7 +109,7 @@ The control plane node hosts Kubernetes control components only; application wor
 
 Monitoring is provided by the kube-prometheus-stack Helm chart.
 
-Currently deployed components include:
+Currently deployed components mostly running on fedora include:
 
 * Prometheus
 * Grafana
@@ -200,7 +203,7 @@ This repository also serves as infrastructure documentation and disaster recover
 
 Each Oracle VM currently has a 50 GB boot volume.
 
-Oracle's free block volume backup service protects the boot disks.
+Oracle's free block volume backup service protects the boot disks (200 GB).
 
 Additionally, the home server periodically performs `rsync` backups of all Oracle virtual machines.
 
@@ -226,7 +229,8 @@ Application deployments are performed by:
 
 1. Building a Docker image
 2. Publishing it to Docker Hub
-3. Updating the Kubernetes Deployment with `kubectl set image`
+3. Updating the Kubernetes Deployment on this cluster (image version) and applying (kubectl apply -f deployment)
+4. Most backends are updated on VM (PM2) or lambda AWS. jobs-api and e-commerce-api are exceptions. They run on k8s with Astra mongoDB.
 
 Infrastructure components such as Cilium and the monitoring stack are managed with Helm.
 
@@ -243,7 +247,7 @@ This repository contains the Kubernetes manifests required to recreate the clust
 * monitoring
 * Cilium configuration
 
-Persistent volume contents are backed up separately and are not yet recreated automatically.
+Persistent volume contents are backed up separately and are not yet recreated automatically. They were moved to fedora from node3 and node4.
 
 ---
 
@@ -255,13 +259,13 @@ Planned work includes:
 
 * Add home Kubernetes worker nodes. Currently added a fedora node.
 * Move Prometheus, Grafana and Alertmanager to the home infrastructure. Done
-* Migrate the three backend applications currently running under PM2. Currently they were moved from node3 to node2. Still under PM2.
-    * jobster/jobify backend has a mongoDB database hosted at Atlas. Moved to node1, as node2 is down.
+* Migrate the three backend applications currently running under PM2. Currently they were moved from node3 to node2. Still under PM2. Spiritist Books on lambda AWS.
+    * jobster/jobify backend has a mongoDB database hosted at Atlas. Moved to node1.
     * Portfolio backend has a strapi with sqlite3 embedded database.
-    * events-backend has a strapi with an external mariaDB database. Both moved to node2. It is down right now.
-* Migrate PostgreSQL. Postgres was moved to node2 and is part of kubernetes store-nextjs app. It is down right now.
-* Migrate the email server currently running on node4. Done. Moved to node2. It is down right now.
+    * events-backend has a strapi with an external mariaDB database. Both moved to node2. 
+* Migrate PostgreSQL. Postgres was moved to node2 and is part of kubernetes store-nextjs app. 
+* Migrate the email server currently running on node4. Done. Moved to node2. 
 * Decommission Oracle nodes 3 and 4. Done
 
-The long-term goal is to operate a stable hybrid Kubernetes cluster spanning Oracle Cloud and the home lab. Still need to update long running apps and generate amd64 images.
+The long-term goal is to operate a stable hybrid Kubernetes cluster spanning Oracle Cloud and the home lab. Still updating long running apps and generate amd64 images.
 
