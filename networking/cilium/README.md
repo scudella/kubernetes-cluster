@@ -11,7 +11,8 @@ The cluster uses:
 - Kubernetes version: 1.33.x
 - Cilium: 1.20.x
 - Oracle Cloud Always Free (Ampere ARM)
-- 2-node Ampere arm cluster - added fedora at home later
+- 2-node Ampere arm cluster running Ubuntu 24.04
+- 1 fedora machine at home lab
 
 ## Current Configuration
 
@@ -36,7 +37,7 @@ native routing or cloud-specific integration.
 The cluster kept kube-proxy enabled to minimize migration risk.
 
 During kubernetes dashboard pods migration to fedora, kube-proxy was deleted and Cilium 
-took over its functionality. This way was simpler to apply IP masquerade.
+took over its functionality. This way was simpler to apply IP masquerade to complete the network routing.
 
 ### Encryption
 
