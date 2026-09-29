@@ -20,6 +20,8 @@ spec:
         app: store-nextjs
 
     spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
       volumes:
       - name: private-key-volume
         secret:
@@ -31,7 +33,7 @@ spec:
             
       containers:
       - name: store-nextjs
-        image: scudella/store-nextjs:v1.0.9
+        image: scudella/store-nextjs:v1.0.12
         imagePullPolicy: IfNotPresent
 
         ports:
