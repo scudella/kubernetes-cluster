@@ -22,6 +22,8 @@ grafana:
   grafana.ini:
     metrics:
       enabled: true
+    server:
+      root_url: "https://scudella.net.br:8081/"
   initChownData:
     enabled: false
   persistence:
