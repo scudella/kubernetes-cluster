@@ -35,7 +35,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
       - name: e-commerce-api
-        image: scudella/e-commerce-api:v1.1.2
+        image: scudella/e-commerce-api:v1.1.3
         imagePullPolicy: IfNotPresent
 
         ports:
