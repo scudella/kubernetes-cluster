@@ -33,7 +33,7 @@ spec:
             
       containers:
       - name: store-nextjs
-        image: scudella/store-nextjs:v1.0.12
+        image: scudella/store-nextjs:v1.0.14
         imagePullPolicy: IfNotPresent
 
         ports:
