@@ -49,6 +49,8 @@ grafana:
 
 prometheus:
   prometheusSpec:
+    retention: 30d
+    retentionSize: "30GB"
     nodeSelector:
       kubernetes.io/hostname: fedora
     storageSpec:
@@ -79,6 +81,7 @@ prometheus:
             labels:
               app_environment: 'external-vm'
               app_name: 'Spiritist-Books-Backend'
+  # service sits directly under prometheus 
   service:
     type: NodePort
     nodePort: 30108
